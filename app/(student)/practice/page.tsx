@@ -159,12 +159,12 @@ export default function PracticePage() {
                             {topics.map((topic) => (
                                 <Card
                                     key={topic.id}
-                                    className="border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 cursor-pointer transition-all hover:-translate-y-1"
+                                    className="border-purple-500/20 bg-black/40 backdrop-blur-xl hover:bg-black/60 cursor-pointer transition-all hover:-translate-y-1 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/20"
                                     onClick={() => fetchQuestion(topic.id, topic.name)}
                                 >
                                     <CardContent className="p-6">
-                                        <h3 className="font-semibold text-white mb-2">{topic.name}</h3>
-                                        <p className="text-sm text-gray-400">{topic.questionCount} questions</p>
+                                        <h3 className="font-semibold mb-2 text-purple-300" style={{ textShadow: '0 0 10px rgba(168, 85, 247, 0.7), 0 0 20px rgba(168, 85, 247, 0.5)' }}>{topic.name}</h3>
+                                        <p className="text-sm text-purple-400/70">{topic.questionCount} questions</p>
                                     </CardContent>
                                 </Card>
                             ))}
