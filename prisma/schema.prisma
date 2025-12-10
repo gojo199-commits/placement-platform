@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  password        String
+  name            String
+  role            Role              @default(STUDENT)
+  createdAt       DateTime          @default(now())
+  
+  // Student fields
+  rollNumber      String?           @unique
+  cgpa            Float?
+  branch          String?
+  graduationYear  Int?
+  skills          String[]
+  
+  // Relations
+  attempts        QuestionAttempt[]
+  applications    Application[]
+  
+  @@index([email])
+}
+
+model Topic {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  category    Category
+  description String?
+  questions   Question[]
+  
+  @@index([category])
+}
+
+model Question {
+  id             String            @id @default(cuid())
+  content        String
+  options        String[]
+  correctAnswer  String
+  explanation    String?
+  difficulty     Difficulty
+  topicId        String
+  topic          Topic             @relation(fields: [topicId], references: [id])
+  createdAt      DateTime          @default(now())
+  attempts       QuestionAttempt[]
+  
+  @@index([topicId])
+  @@index([difficulty])
+}
+
+model QuestionAttempt {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  questionId  String
+  question    Question  @relation(fields: [questionId], references: [id])
+  isCorrect   Boolean
+  timeTaken   Int       // seconds
+  attemptedAt DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([questionId])
+}
+
+model Company {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  password    String
+  description String?
+  createdAt   DateTime     @default(now())
+  jobPostings JobPosting[]
+}
+
+model JobPosting {
+  id             String        @id @default(cuid())
+  companyId      String
+  company        Company       @relation(fields: [companyId], references: [id])
+  title          String
+  description    String
+  requiredSkills String[]
+  minCGPA        Float
+  salary         String?
+  location       String?
+  createdAt      DateTime      @default(now())
+  applications   Application[]
+  
+  @@index([companyId])
+}
+
+model Application {
+  id           String           @id @default(cuid())
+  studentId    String
+  student      User             @relation(fields: [studentId], references: [id])
+  jobPostingId String
+  jobPosting   JobPosting       @relation(fields: [jobPostingId], references: [id])
+  matchScore   Float?
+  status       ApplicationStatus @default(APPLIED)
+  appliedAt    DateTime         @default(now())
+  
+  @@unique([studentId, jobPostingId])
+  @@index([jobPostingId])
+}
+
+enum Role {
+  STUDENT
+  COMPANY
+  ADMIN
+}
+
+enum Category {
+  APTITUDE
+  TECHNICAL
+  CODING
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  REJECTED
+  SELECTED
+}
